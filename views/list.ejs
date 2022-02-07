@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<style>
+    body {
+        text-align: center;
+    }
+    p {
+        display: inline;
+    }
+    .buy {
+        font-size: 20px;
+        background-color: blanchedalmond;
+        margin-top: 5px;
+        text-align: center;
+    }
+    .sell {
+        font-size: 20px;
+        background-color: skyblue;
+        margin-top: 5px;
+        text-align: center;
+    }
+</style>
+<body>
+    <h1><%=user.name %>님의 내역</h1>
+    <h2>총<%= data.bill.length%>건</h2>
+    <div style="background-color: darkgrey;" class="score"></div>
+    <% for(let i=0; i<data.bill.length; i++) { %>
+        <div class="<%= data.bill[i].type %>">
+            <p><%= data.bill[i].currencyCode %></p>
+            <p><%= data.bill[i].basePrice %>Won</p>
+            <p><%= data.bill[i].count %></p>
+            <p><%= data.bill[i].type %></p>
+            <p><%= data.bill[i].time.toLocaleDateString() %> <%= data.bill[i].time.getHours() %>시 <%= data.bill[i].time.getMinutes() %>분</p>
+        </div>
+    <% } %>
+    <script>
+
+        const score = document.querySelector(".score")
+        let p = "<%= JSON.stringify(data) %>"
+        let u = "<%= JSON.stringify(user) %>"
+        p = p.replaceAll('&#34;', '\"')
+        u = u.replaceAll('&#34;', '\"')
+        p = JSON.parse(p)
+        u= JSON.parse(u)
+        let c = {}
+        const bill = p['bill']
+        bill.forEach(e => {
+            if(!c[e.currencyCode]) {
+                c[e.currencyCode] = e.count
+            } else {
+                c[e.currencyCode] += e.count
+            }
+        })
+        var list = [];
+for (let vehicle in c) {
+    list.push([vehicle, c[vehicle]]);
+}
+list.sort(function(a, b) {
+    return b[1]-a[1] ;
+})
+score.innerHTML = `<h2>${u.name}님이</h2><h2>가장 많은 거래량의 화폐는</h2><h2>${list[0][0]}입니다!!!</h2><p>총 ${list[0][1]}번</p>`
+console.log(list)
+
+    </script>
+</body>
+</html>

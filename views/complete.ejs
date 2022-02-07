@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<style>
+    body {
+        text-align: center;
+    }
+</style>
+<body>
+    <image style="width:150px; height:150px" src="<%= image %>"></image>
+    <h1><%= message %></h1>
+    <% if (submessage) { %>
+        <h3><%= submessage %></h3>
+    <% } %>
+    <h2 style=" font-size:24px; margin-top: -10px;">항목 : <%= what.currencyCode %></h2>
+    <h2 style="font-size:24px; margin-top: -18px;">가격(개당) : <%= what.basePrice %></h2>
+    <h2 style=" font-size:24px; margin-top: -18px;">수량 : <%= count %></h2>
+    <h2 style=" font-size:24px; margin-top: -10px;">총 가격 : <% let total = count*what.basePrice %><%= total %></h2>
+    <h2 style=" font-size:24px;margin-top: -18px;">잔액 : <%= wallet.kmoney.toFixed(2) %></h2>
+    <p id="demo"></p>
+    <button onclick="window.close()">돌아가기</button>
+    <script>
+        let time = 15;
+        let min = ""
+        let sec =""
+        let x = setInterval(function() {
+            min = parseInt(time/60)
+            sec = time%60
+            document.getElementById("demo").innerHTML = sec + "초 후 돌아갑니다"
+            time--;
+            if(time<0) {
+                clearInterval(x)
+                window.close()
+            }
+        }, 500)
+    </script>
+</body>
+</html>

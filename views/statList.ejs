@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>잠좀 자요</title>
+</head>
+<style>
+    body {
+        display: flex;
+        flex-direction: column;
+        text-align: center;
+        align-items: center;
+        justify-content: center;
+    }
+    .buy {
+        background-color: pink;
+    }
+    .sell {
+        background-color: powderblue;
+    }
+    #box {
+        width: 500px;
+        margin-top: 0px;
+    }
+    #box > p {
+        display: inline;
+    }
+    table {
+    width: 100%;
+    border-top: 1px solid #444444;
+    border-collapse: collapse;
+  }
+  th, td {
+    border-bottom: 1px solid #444444;
+    padding: 10px;
+  }
+  td {
+    font-size: 15px;
+    font-weight: bold;
+  }
+</style>
+<body>
+    <h1><%= bilnm %></h1>
+    <h2 style="margin-top: -10px;"><%= user.name %>님의 내역</h2>
+    <table border="">
+    <th>가격</th>
+    <th>수량</th>
+    <th>거래종류</th>
+    <th>시간</th>
+    <% for(let i=0; i<list.length; i++) { %>
+        <tr class="<%= list[i].type %>">
+            <td><%= list[i].basePrice %>원</td>
+            <td><%= list[i].count %></td>
+            <td><%= list[i].type %></td>
+            <td><%= list[i].time.toLocaleString() %></td>
+        </tr>
+    <% } %>
+    </table>
+</body>
+</html>

@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/morris.js/0.5.1/morris.css">
+    <link rel="icon" href="/country/<%= list[list.length-1].currencyCode %>.png">
+    <title><%= list[list.length-1].currencyCode %> - 대한민국 환율 시뮬레이션</title>
+</head>
+<style>
+    body {
+    text-align: center;
+    }
+    .barbtn {
+        width:100px;
+        height:35px;
+        background-color: black;
+        border: none;
+        border-radius:  100px;
+        color:#fff;
+        text-align: center;
+        text-decoration: none;
+        display: inline-block;
+        font-size: 20px;
+        margin: 4px;
+        cursor: pointer;
+    }
+
+    .ctnbtn {
+        width:40px;
+        height: 20px;
+        border: none;
+        border-radius: 30px;
+        color:black;
+        text-align: center;
+        text-decoration: none;
+        display: inline-block;
+        font-size: 12px;
+        margin: 2px;
+        cursor: pointer;
+        opacity: 60%;
+    }
+
+    /* --------------------------------- */
+input[type="number"] {
+    -webkit-appearance: textfield;
+    -moz-appearance: textfield;
+    appearance: textfield;
+}
+
+input[type=number]::-webkit-inner-spin-button,
+input[type=number]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+}
+
+.number-input {
+    border: 2px solid #ddd;
+    display: inline-flex;
+}
+
+.number-input,
+.number-input * {
+    box-sizing: border-box;
+}
+
+.number-input button {
+    outline:none;
+    -webkit-appearance: none;
+    background-color: #eeeeee;
+    border: none;
+    align-items: center;
+    justify-content: center;
+    width: 2.5rem;
+    cursor: pointer;
+    margin: 0;
+    position: relative;
+    padding:0;
+}
+
+.number-input button:before,
+.number-input button:after {
+    display: inline-block;
+    position: absolute;
+    content: '';
+    width: 3px;
+    height: 2px;
+    background-color: #212121;
+    transform: translate(-50%, -50%);
+}
+.number-input button.plus:after {
+    transform: translate(-50%, -50%) rotate(90deg);
+}
+
+.number-input input[type=number] {
+    font-family: sans-serif;
+    max-width: 2rem;
+    border:0;
+    text-align: center;
+    background-color: lightgray;
+}
+.number-input{
+    
+    border:0
+}
+</style>
+<body onload="init()">
+    <div>
+        <div style="margin-top: 30px;">
+            <h1 style="display: inline; font-size: 40px;"><%= list[list.length-1].currencyCode %></h1>
+            <h2 style="display: inline;">(<%= list[list.length-1].currencyName %>)</h2>
+        </div>
+    <% if(list[list.length-1].change === 'RISE') { %>
+        <h1 style="color: red; font-weight: bolder; ">₩ <%= list[list.length-1].basePrice %>▲</h1>
+    <% } else if(list[list.length-1].change ==='FALL') {%>
+        <h1 style="color: blue; font-weight: bolder;">₩ <%= list[list.length-1].basePrice %>▼</h1>
+    <% } else { %>
+        <h1 style="color: black; font-weight: bolder;">₩ <%= list[list.length-1].basePrice %></h1>
+    <% } %>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.5.0/Chart.min.js"></script>
+	<canvas id="line-chart"></canvas>
+    <p style=" font-weight: 900; font-size: 26px;"><%= investing.count %>개 보유</p>
+    <div style="margin-top: -20px; margin-bottom: 20px;">
+        <p style=" font-weight: 900; display: inline;" class="nice"></p><a href='<%= list[list.length-1].currencyCode %>/myincome' style="font-weight: 500; font-size: 10px;"> 수익자세히보기</a>
+    </div>
+
+    <form name="pay" method="get">
+        <div>
+            <input type=hidden name="sell_price" value="<%=list[list.length-1].basePrice%>" />
+            <td>
+                <div class="form-row justify-content-center">
+                  <div class="form-group mb-0">
+                    <div class="input-group mx-auto mb-0">
+                      <div class="number-input">
+                        <input style="border: 0; width: 50px; height: 25px;" type="button" value="-" onclick="del()" ></input>
+                        <input class="quantity bg-light" onchange="change();" min="1" placeholder="0" name="p" value="1" type="number">
+                        <input style="border: 0; width: 50px; height: 25px;" type="button" value="+" onclick="add()" class="plus"></input>
+                      </div>
+                      <input style=" border: 0; width: 80px; height: 25px; text-align:center ;border:0; background-color: lightgray; " type="text" name="sum" size="5" readonly>
+                    </div>
+                  </div>
+                </div>
+              </td>
+        </div>
+          <div style="margin-top: 10px;">
+            <input class="barbtn" value="매수" type="submit" onclick='paycheck("buy");'></input>
+            <input class="barbtn" type="submit" value="매도" onclick='paycheck("sell");'></input>
+        </div>
+    </form>
+    <button style="width: 200px; height:30px; color: white;" class="barbtn" onclick='window.open("<%= list[list.length-1].currencyCode %>" + "/list", "a","width=500, height=500")'>내역보기</button>
+    </div>
+    <script>
+        let p = "<%= JSON.stringify(list) %>"
+        let myexchangebill = "<%= JSON.stringify(myexchangebill) %>"
+        p = p.replaceAll('&#34;', '\"')
+        myexchangebill = myexchangebill.replaceAll('&#34;', '\"')
+        p = JSON.parse(p)
+        myexchangebill = JSON.parse(myexchangebill)
+        let lab = []
+        let data = []
+
+        p.forEach(e => {
+            lab.push(e.time)
+            data.push(e.basePrice)
+        })
+
+        const g = document.querySelector("#line-chart")
+
+        let w = window.innerWidth
+        let h = window.innerHeight
+
+        g.width = `${w}`
+        g.height = `${(h/2) -20}`
+
+        new Chart(document.getElementById("line-chart"), { //차트 객체를 만든다
+            type: 'line',
+            data: {
+                labels: lab,
+                datasets: [{
+                    data: data, //이곳에 가공한 코드를 넣는다
+                    label: p[0].currencyCode,
+                    borderColor: "#3e95cd",
+                    fill: true
+                }
+                ]
+            },
+            options: {
+                title: {
+                    display: true,
+                    text: '환율 그래프'
+                }
+            }
+        });
+
+        let totalcnt = "<%= investing.count %>"
+        totalcnt = parseInt(totalcnt)
+        let cnt = 0
+        let basicArray = []
+
+        let ex= myexchangebill.reverse()
+
+        for (let i=0; i<ex.length; i++) {
+            if(ex[i].type === 'buy') {
+                if(cnt < totalcnt) {
+                    basicArray.push({basePrice:ex[i].basePrice, count : ex[i].count})
+                } else {
+                    basicArray[basicArray.length-1].count += totalcnt-cnt
+                    break;
+                }
+                cnt += ex[i].count
+            }
+        }
+
+        const nice = document.querySelector(".nice")
+        let nicePrice =0
+        basicArray.forEach(e => {
+            nicePrice += e.basePrice * e.count
+        })
+        nicePrice = (p[p.length-1].basePrice * totalcnt) - nicePrice
+        nice.innerText = `현재 총 ${(nicePrice<0 ? (nicePrice*-1).toFixed(2)+"원 손해를 보는 중" : nicePrice.toFixed(2) + "원 이득을 보는 중")}`
+
+
+        function paycheck(where){
+            var gsWin = window.open('payviewer','payviewer','width=500,height=500');
+            var frm = document.pay
+            frm.action = location.href+"/"+where
+            frm.target ="payviewer"
+            frm.method ="get"
+            frm.submit()
+            location.reload()
+        }
+        var sell_price;
+        var amount;
+        function init () {
+            sell_price = document.pay.sell_price.value;
+            amount = document.pay.p.value;
+            document.pay.sum.value = sell_price;
+            change();
+        }
+        function add () {
+            hm = document.pay.p;
+            sum = document.pay.sum;
+            hm.value ++ ;
+            sum.value = parseInt(hm.value) * sell_price;
+        }
+        function del () {
+            hm = document.pay.p;
+            sum = document.pay.sum;
+            if (hm.value > 1) {
+                hm.value -- ;
+                sum.value = parseInt(hm.value) * sell_price;
+            }
+        }
+        function change () {
+            hm = document.pay.p;
+            sum = document.pay.sum;
+            if (hm.value < 0) {
+                hm.value = 0;
+            }
+            sum.value = parseInt(hm.value) * sell_price;
+        }
+    </script>
+</body>
+</html>

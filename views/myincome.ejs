@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Income</title>
+</head>
+<style>
+    body {
+        text-align: center;
+    }
+</style>
+<body>
+    <div class="nice"></div>
+    <div class="moreMyIncome"></div>
+</body>
+<script>
+        let have = "<%= JSON.stringify(have) %>"
+        let p = "<%= JSON.stringify(list) %>"
+        have = have.replaceAll('&#34;', '\"')
+        p = p.replaceAll('&#34;', '\"')
+        p = JSON.parse(p)
+        have = JSON.parse(have)
+        let totalcnt = "<%= wallet.count %>"
+        totalcnt = parseInt(totalcnt)
+        let cnt = 0
+        let basicArray = []
+
+        let ex= have.reverse()
+
+        for (let i=0; i<ex.length; i++) {
+            if(ex[i].type === 'buy') {
+                if(cnt < totalcnt) {
+                    basicArray.push({basePrice:ex[i].basePrice, count : ex[i].count})
+                } else {
+                    basicArray[basicArray.length-1].count += totalcnt-cnt
+                    break;
+                }
+                cnt += ex[i].count
+            }
+        }
+
+        const nice = document.querySelector(".nice")
+        let nicePrice =0
+        basicArray.forEach(e => {
+            nicePrice += e.basePrice * e.count
+        })
+        nicePrice = (p[p.length-1].basePrice * totalcnt) - nicePrice
+        nice.innerText = `현재 총 ${(nicePrice<0 ? (nicePrice*-1).toFixed(2)+"원 손해를 보는 중" : nicePrice.toFixed(2) + "원 이득을 보는 중")}`
+
+        const i = document.querySelector(".moreMyIncome")
+        let text=""
+        let temp
+        basicArray.forEach(e => {
+            temp = (p[p.length-1].basePrice - e.basePrice) * e.count
+            text+= `<h1 style="display:inline">${e.basePrice}원에 계약한 </h1><h2 style="display:inline">${e.count}개가 </h2><h3 >${(temp < 0) ? `${(temp * -1).toFixed(2)}원 손해을 보고있습니다` : `${temp.toFixed(2)}원 이득을 보고있습니다`}</h3>`
+        })
+        i.innerHTML = text
+</script>
+</html>

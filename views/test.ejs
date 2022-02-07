@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="keywords" content="대한민국 환율 시뮬레이션, 환전, 환율, 대한민국, 시뮬레이션, 경제">
+    <meta name="description" content="대한민국 환율 시뮬레이션을 통해 여러 국가의 통화를 이곳에서 운용해보세요">
+    <meta name="author" content="OHDONGHYEON&JESUS, 하나은행">
+    <link rel="icon" href="favicon.png">
+    <title>대한민국 환율 시뮬레이션</title>
+</head>
+<style>
+    body {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+    }
+    #container {
+        max-width: 1100px;
+        text-align: center;
+    }
+    .content { 
+        display: inline-block;
+        text-align: center;
+        width:260px;
+        height: 130px;
+        margin-top: 5px;
+        background-color: whitesmoke;
+        border-radius: 15px ;
+    }
+    .barbtn {
+        width:85px;
+        height: 25px;
+        background-color: gray;
+        border: none;
+        border-radius: 15px;
+        color:#fff;
+        text-align: center;
+        text-decoration: none;
+        display: inline-block;
+        font-size: 13px;
+        margin: 4px;
+        cursor: pointer;
+    }
+    .ctnbtn {
+        width:60px;
+        height: 20px;
+        background-color: gray;
+        border: none;
+        border-radius: 15px;
+        color:#fff;
+        text-align: center;
+        text-decoration: none;
+        display: inline-block;
+        font-size: 12px;
+        margin: 2px;
+        cursor: pointer;
+        opacity: 60%;
+    }
+    #general {
+        display: inline-block;
+        margin-top: -20px;
+        margin-left: 10px;
+        margin-right: 10px;
+        cursor: pointer;
+    }
+    footer {
+        display: inline;
+        margin-top: 100px;
+        width: 100%;
+        height:250px;
+        background-color: darkgrey;
+    }
+    footer > div {
+        display: inline-block;
+    }
+</style>
+<body>
+    <h1>대한민국 환율 시뮬레이션</h1>
+    <h2 style="margin-top: -20px;"><%= time.toLocaleDateString()%> | <%= time.getHours()%>시 <%= time.getMinutes()%>분 기준</h2>
+    <div class="statbar" style="height:150px; background-color: whitesmoke; margin-top: 30px;">
+        <h2 style="padding-inline: 30px;"><%= user.name %>님의 보유 금액은 <%= user.wallet.kmoney.toFixed(2) %>원 입니다</h2>
+        <button onclick="location.href+='/list'"class="barbtn">사용내역</button>
+        <button class="barbtn" onclick="location.href='/logout' ">로그아웃</button>
+        <button class="barbtn">설정</button>
+    </div>
+    <div style="max-width: 1100px; margin-top:20px; margin-bottom: 30px; border-radius: 30px;">
+        <h2>보유 화폐</h2>
+        <% let cont=0 %>
+        <h2 class="total" style="margin-top: -10px;"></h2>
+        <% for(let i=0; i<have.length; i++) { %>
+            <% if (have[i][1].count !== 0) { cont+=1 %>
+                <div id="general" class="<%= have[i][1].currencyCode %>">
+                    <image src="./country/<%= have[i][1].currencyCode %>.png"></image>
+                    <h3 style="margin-top: -15px;"><%= have[i][1].currencyCode %></h3>
+                    <h3 style="margin-top: -10px;"><%= have[i][1].count %>개</h3>
+                </div>
+            <% } %>
+        <% } %>
+    </div>
+    <div>
+        <h2 style="display:inline;">전세계 화폐</h2>
+        <button style="display:inline; background-color: transparent; border:0; width: 15px; height:15px; padding:1%" onclick="location.reload()"><image style="width: 10px; height:10px" src="data:image/png;base64,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"></image></button>
+            <div id="container">
+                <% for (var i=0; i<data.length; i++){ %>
+                    <div id="<%= data[i].currencyCode %>" class="content">
+                        <p style="font-weight:bold;"><%= data[i].name %></p>
+                            <% if(data[i].change === 'RISE') { %>
+                                <p style="color: red; font-weight: bolder; font-size: 15px;">₩<%= data[i].basePrice %>▲</p>
+                            <% } else if(data[i].change ==='FALL') {%>
+                                <p style="color: blue; font-weight: bolder; font-size: 15px;">₩<%= data[i].basePrice %>▼</p>
+                            <% } else { %>
+                                <p style="color: black; font-weight: bolder; font-size: 15px;">₩<%= data[i].basePrice %></p>
+                            <% } %>
+        
+                            <button onclick="paycheck('<%= data[i].currencyCode %>', 'buy')" class="ctnbtn">사기</button><button onclick="paycheck('<%= data[i].currencyCode %>', 'sell')"" class="ctnbtn">팔기</button><button onclick="location.href+='/<%= data[i].currencyCode %>'" class="ctnbtn">자세히</button>
+        
+                    </div>
+                <% }%>
+            </div>
+    </div>
+    <footer>
+        <div>
+        <h2>대한민국 환율 시뮬레이션</h2>
+        <h3 style="margin-top: -10px;">All rights reserved</h3>
+        </div>
+        <div style="margin-left: 30px;">
+            <h6>개발자 : 하나님 & 오동현</h6>
+            <h6 style="margin-top:-20px">사용API : 하나은행 </h6>
+            <h6 style="margin-top:-20px">연락처 : namjangsu12@gmail.com</h6>
+            <h6 style="margin-top:-20px">Product Num : 3th</h6>
+        </div>
+    </footer>
+    <script>
+        const cont = "<%= cont %>"
+        document.querySelector(".total").innerText = `총 ${cont}개 국`
+        window.addEventListener('resize', ()=>{
+            var w = window.innerWidth
+            console.log(w)
+            document.querySelector(".statbar").style.width = `${w}px`
+        }, true);
+        var w = window.innerWidth
+            console.log(w)
+            document.querySelector(".statbar").style.width = `${w}px`
+      setTimeout(() => {
+        location.reload()
+      } ,30000);
+
+      const cl = document.querySelectorAll("#general");
+
+      cl.forEach(d => {
+          d.addEventListener("click", (e) => {
+              var ac = document.getElementById(d.className)
+              window.scrollTo({
+                  top: ac.offsetTop-350,
+                  behavior: 'smooth'
+              })
+              let time = 10;
+              let sec =""
+              let color = "whitesmoke"
+
+              function change() {
+                    ac.style['background-color'] = color
+              }
+              let x = setInterval(function() {
+                  sec = time%60
+                  time--;
+                  if(color === "pink") {
+                        color = "whitesmoke"
+                        change()
+                    } else {
+                        color = "pink"
+                        change()
+                    }
+                    if(time<0) {
+                        clearInterval(x)
+                        ac.style['background-color'] = "whitesmoke"
+                    }
+                }, 1000)
+          })
+      })
+      var gsWin
+      function paycheck(where, type){
+            gswin = window.open(`${location.href}/${where}/${type}`, 'pop01', 'top=10, left=10, width=500, height=600, status=no, menubar=no, toolbar=no, resizable=no')
+            var timer = setInterval(function() {
+                if(gswin.closed) {
+                    clearInterval(timer)
+                    location.reload()
+                }
+            }, 1000)
+        }
+        window.onpageshow = function(e) {
+            if(e.persited || (window.performance && window.performance.navigation.type ==2)) {
+                location.reload()
+            }
+        }
+    </script>
+</body>
+</html>
